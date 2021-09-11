@@ -1,4 +1,6 @@
-# DEMO x BPF LSM Changes Everything @ Cloud Native eBPF Day NA 2021
+# DEMO x LSM BPF Changes Everything @ Cloud Native eBPF Day NA 2021
+
+> [Abstract](https://sched.co/mFTQ)
 
 TBD
 
