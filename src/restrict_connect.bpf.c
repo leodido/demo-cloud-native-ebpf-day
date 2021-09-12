@@ -36,7 +36,7 @@ int BPF_PROG(restrict_connect, struct socket *sock, struct sockaddr *address, in
     {
         if (full_printk)
         {
-            bpf_printk("lsm: blocking %pI4h", &dest);
+            bpf_printk("lsm: blocking %pI4", &dest);
         }
         else
         {

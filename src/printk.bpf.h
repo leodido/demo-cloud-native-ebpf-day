@@ -6,7 +6,7 @@ struct trace_event_raw_bpf_trace_printk___x
 };
 
 // Redefine bpf_prink to support:
-// - automatic new line
+// - automatic new lines
 #undef bpf_printk
 #define bpf_printk(fmt, ...)                                                       \
     (                                                                              \
