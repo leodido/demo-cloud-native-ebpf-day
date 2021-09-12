@@ -1,10 +1,11 @@
 OUTPUT := .output
 CLANG ?= clang
 LLVM_STRIP ?= llvm-strip
-BPFTOOL ?= $(abspath ../tools/bpftool)
+BPFTOOL_LOCAL ?= ../tools/bpftool
+BPFTOOL = $(abspath $(BPFTOOL_LOCAL))
 LIBBPF_SRC := $(abspath ../libbpf/src)
 LIBBPF_OBJ := $(abspath $(OUTPUT)/libbpf.a)
-VMLINUX := ../vmlinux/vmlinux.h
+VMLINUX := $(abspath $(OUTPUT)/vmlinux/vmlinux.h)
 # Use our own libbpf API headers and Linux UAPI headers distributed with
 # libbpf to avoid dependency on system-wide headers, which could be missing or
 # outdated
@@ -30,7 +31,7 @@ ifeq ($(V),1)
 	msg =
 else
 	Q = @
-	msg = @printf '  %-8s %s%s\n'					\
+	msg = @printf '  %-16s %s%s\n'					\
 		      "$(1)"						\
 		      "$(patsubst $(abspath $(OUTPUT))/%,%,$(2))"	\
 		      "$(if $(3), $(3))";
@@ -44,6 +45,7 @@ all: $(APPS)
 clean:
 	$(call msg,CLEAN)
 	$(Q)rm -rf $(OUTPUT) $(APPS)
+	$(Q)unlink $(BPFTOOL)
 
 $(OUTPUT) $(OUTPUT)/libbpf:
 	$(call msg,MKDIR,$@)
@@ -57,13 +59,25 @@ $(LIBBPF_OBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPU
 		    INCLUDEDIR= LIBDIR= UAPIDIR=			      \
 		    install
 
+# Link bpftool
+$(BPFTOOL): $(shell command -v bpftool)
+	$(call msg,LINK-BPFTOOL,$(BPFTOOL_LOCAL))
+	$(Q)$(shell ln -s $< $@)
+
+# Generate vmlinux.h
+$(VMLINUX): $(BPFTOOL)
+	$(call msg,MKDIR,$(dir $@))
+	$(Q)mkdir -p $(dir $@)
+	$(call msg,GEN-VMLINUX,$@)
+	$(Q)$(BPFTOOL) btf dump file /sys/kernel/btf/vmlinux format c > $@
+
 # Build BPF code
 $(OUTPUT)/%.bpf.o: %.bpf.c $(LIBBPF_OBJ) $(wildcard %.h) $(VMLINUX) | $(OUTPUT)
 	$(call msg,BPF,$@)
 	$(Q)$(CLANG) -g -O2 -target bpf -D__TARGET_ARCH_$(ARCH) $(INCLUDES) $(CLANG_BPF_SYS_INCLUDES) -c $(filter %.c,$^) -o $@
 
 # Generate BPF skeletons
-$(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o | $(OUTPUT)
+$(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o $(BPFTOOL) | $(OUTPUT)
 	$(call msg,GEN-SKEL,$@)
 	$(Q)$(BPFTOOL) gen skeleton $< > $@
 
