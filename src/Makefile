@@ -31,7 +31,7 @@ ifeq ($(V),1)
 	msg =
 else
 	Q = @
-	msg = @printf '  %-16s %s%s\n'					\
+	msg = @printf '  %-8s %s%s\n'					\
 		      "$(1)"						\
 		      "$(patsubst $(abspath $(OUTPUT))/%,%,$(2))"	\
 		      "$(if $(3), $(3))";
@@ -61,14 +61,14 @@ $(LIBBPF_OBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(OUTPU
 
 # Link bpftool
 $(BPFTOOL): $(shell command -v bpftool)
-	$(call msg,LINK-BPFTOOL,$(BPFTOOL_LOCAL))
+	$(call msg,BPFTOOL,$(BPFTOOL_LOCAL))
 	$(Q)$(shell ln -s $< $@)
 
 # Generate vmlinux.h
 $(VMLINUX): $(BPFTOOL)
 	$(call msg,MKDIR,$(dir $@))
 	$(Q)mkdir -p $(dir $@)
-	$(call msg,GEN-VMLINUX,$@)
+	$(call msg,VMLINUX,$@)
 	$(Q)$(BPFTOOL) btf dump file /sys/kernel/btf/vmlinux format c > $@
 
 # Build BPF code
@@ -78,7 +78,7 @@ $(OUTPUT)/%.bpf.o: %.bpf.c $(LIBBPF_OBJ) $(wildcard %.h) $(VMLINUX) | $(OUTPUT)
 
 # Generate BPF skeletons
 $(OUTPUT)/%.skel.h: $(OUTPUT)/%.bpf.o $(BPFTOOL) | $(OUTPUT)
-	$(call msg,GEN-SKEL,$@)
+	$(call msg,SKEL,$@)
 	$(Q)$(BPFTOOL) gen skeleton $< > $@
 
 # Build user-space code
