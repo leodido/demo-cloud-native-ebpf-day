@@ -2,6 +2,7 @@
 #include <bpf/bpf_core_read.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
+#include "printk.bpf.h"
 
 char LICENSE[] SEC("license") = "GPL";
 
@@ -22,13 +23,13 @@ static inline bool is_program(char a[])
     return flag;
 }
 
-typedef union
-{
-    unsigned int integer;
-    unsigned char byte[4];
-} ipv4tochar;
+// typedef union
+// {
+//     unsigned int integer;
+//     unsigned char byte[4];
+// } ipv4tochar;
 
-static inline ipv4tochar
+static inline int
 get_ip(struct sk_buff *skb)
 {
     char *hdr_hdr;
@@ -50,18 +51,15 @@ get_ip(struct sk_buff *skb)
     bpf_core_read(&ip_vers, sizeof(ip_vers), ipaddr);
     ip_vers = ip_vers >> 4 & 0xf;
 
-    ipv4tochar ret;
     if (ip_vers == 4)
     {
         struct iphdr iph_hdr;
         bpf_core_read(&iph_hdr, sizeof(iph_hdr), ipaddr);
 
-        ret.integer = iph_hdr.daddr;
-
-        return ret;
+        return iph_hdr.daddr;
     }
 
-    return ret;
+    return -1;
 }
 
 SEC("tp/net/net_dev_queue")
@@ -72,12 +70,20 @@ int handle_net_dev_queue(struct trace_event_raw_net_dev_template *ctx)
 
     if (is_program(comm))
     {
-        ipv4tochar res = get_ip((struct sk_buff *)ctx->skbaddr);
-        if (res.integer > 0)
+        int res = get_ip((struct sk_buff *)ctx->skbaddr);
+        if (res != -1)
         {
-            bpf_printk("tp/sched/net_dev_queue: %d\n", res.integer);
-            bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[0], res.byte[1]);
-            bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[2], res.byte[3]);
+            if (full_printk)
+            {
+                bpf_printk("tp/sched/net_dev_queue: %pI4", &res);
+            }
+            else
+            {
+                bpf_printk("tp/sched/net_dev_queue: %d", res);
+            }
+            // bpf_printk("tp/sched/net_dev_queue: %d\n", res.integer);
+            // bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[0], res.byte[1]);
+            // bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[2], res.byte[3]);
         }
     }
     return 0;

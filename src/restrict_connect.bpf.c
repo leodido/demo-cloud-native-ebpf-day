@@ -2,7 +2,7 @@
 #include <bpf/bpf_core_read.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
-#include "full_printk.bpf.h"
+#include "printk.bpf.h"
 
 char LICENSE[] SEC("license") = "GPL";
 
@@ -40,7 +40,7 @@ int BPF_PROG(restrict_connect, struct socket *sock, struct sockaddr *address, in
         }
         else
         {
-            bpf_printk("lsm: blocking %d\n", dest);
+            bpf_printk("lsm: blocking %d", dest);
         }
         return -EPERM;
     }

@@ -2,6 +2,7 @@
 #include <bpf/bpf_core_read.h>
 #include <bpf/bpf_helpers.h>
 #include <bpf/bpf_tracing.h>
+#include "printk.bpf.h"
 
 char LICENSE[] SEC("license") = "GPL";
 
@@ -40,16 +41,14 @@ int BPF_KPROBE(handle_security_socket_connect, struct socket *sock, struct socka
             __u32 addr;
             bpf_core_read(&addr, sizeof(addr), &saddr->sin_addr.s_addr);
 
-            union
+            if (full_printk)
             {
-                unsigned int integer;
-                unsigned char byte[4];
-            } ipv4tochar;
-            ipv4tochar.integer = addr;
-
-            bpf_printk("kprobe: %d\n", addr);
-            bpf_printk("kprobe: %u.%u\n", ipv4tochar.byte[0], ipv4tochar.byte[1]);
-            bpf_printk("kprobe: %u.%u\n", ipv4tochar.byte[2], ipv4tochar.byte[3]);
+                bpf_printk("kprobe: %pI4", &addr);
+            }
+            else
+            {
+                bpf_printk("kprobe: %d\n", addr);
+            }
         }
     }
 
