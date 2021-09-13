@@ -14,7 +14,7 @@ const __u32 blockme = 16843009; // 1.1.1.1 -> int
 SEC("lsm/socket_connect")
 int BPF_PROG(restrict_connect, struct socket *sock, struct sockaddr *address, int addrlen, int ret)
 {
-    // Exit if this is not the first LSM hook and the previous BPF program requires us to exit
+    // Satisfying "cannot override a denial" rule
     if (ret != 0)
     {
         return ret;

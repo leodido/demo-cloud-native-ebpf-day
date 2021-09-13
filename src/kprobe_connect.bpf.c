@@ -6,7 +6,7 @@
 
 char LICENSE[] SEC("license") = "GPL";
 
-const char program[16] = "curl";
+const char program[16] = "attack_connect";
 
 static inline bool is_program(char a[])
 {

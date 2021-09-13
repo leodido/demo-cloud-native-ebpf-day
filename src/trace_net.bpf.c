@@ -6,7 +6,7 @@
 
 char LICENSE[] SEC("license") = "GPL";
 
-const char program[16] = "curl";
+const char program[16] = "attack_connect";
 
 static inline bool is_program(char a[])
 {
@@ -22,12 +22,6 @@ static inline bool is_program(char a[])
     }
     return flag;
 }
-
-// typedef union
-// {
-//     unsigned int integer;
-//     unsigned char byte[4];
-// } ipv4tochar;
 
 static inline int
 get_ip(struct sk_buff *skb)
@@ -81,9 +75,6 @@ int handle_net_dev_queue(struct trace_event_raw_net_dev_template *ctx)
             {
                 bpf_printk("tp/sched/net_dev_queue: %d", res);
             }
-            // bpf_printk("tp/sched/net_dev_queue: %d\n", res.integer);
-            // bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[0], res.byte[1]);
-            // bpf_printk("tp/sched/net_dev_queue: %u.%u\n", res.byte[2], res.byte[3]);
         }
     }
     return 0;
