@@ -7,8 +7,7 @@ LIBBPF_SRC := $(abspath ../libbpf/src)
 LIBBPF_OBJ := $(abspath $(OUTPUT)/libbpf.a)
 VMLINUX := $(abspath $(OUTPUT)/vmlinux/vmlinux.h)
 # Use our own libbpf API headers and Linux UAPI headers distributed with
-# libbpf to avoid dependency on system-wide headers, which could be missing or
-# outdated
+# libbpf to avoid dependency on system-wide headers, which could be missing or outdated
 INCLUDES := -I$(OUTPUT) -I../libbpf/include/uapi -I$(dir $(VMLINUX))
 CFLAGS := -g -Wall
 ARCH := $(shell uname -m | sed 's/x86_64/x86/')
@@ -65,11 +64,11 @@ $(BPFTOOL): $(shell command -v bpftool)
 	$(Q)$(shell ln -s $< $@)
 
 # Generate vmlinux.h
-$(VMLINUX): $(BPFTOOL)
+$(VMLINUX): $(BPFTOOL) /sys/kernel/btf/vmlinux
 	$(call msg,MKDIR,$(dir $@))
 	$(Q)mkdir -p $(dir $@)
 	$(call msg,VMLINUX,$@)
-	$(Q)$(BPFTOOL) btf dump file /sys/kernel/btf/vmlinux format c > $@
+	$(Q)$(BPFTOOL) btf dump file $(word 2,$^) format c > $@
 
 # Build BPF code
 $(OUTPUT)/%.bpf.o: %.bpf.c $(LIBBPF_OBJ) $(wildcard %.h) $(VMLINUX) | $(OUTPUT)
