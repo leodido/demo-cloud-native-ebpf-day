@@ -12,48 +12,65 @@ git clone --recurse-submodules -j8 https://github.com/leodido/demo-cloud-native-
 
 I guess you wanna now build this machinery. Cool!
 
-Wait a sec: here are some preconditions to get all of this demo working:
+### Prerequisites
 
-- You need a [BTF](https://www.kernel.org/doc/html/latest/bpf/btf.html) capable Kernel (Linux Kernel 4.18+).
+Wait a sec, here are some preconditions to get all of this demo working...
 
-    To check whether you have a BTF enabled kernel run:
+<details>
+<summary>You need a <a href="https://www.kernel.org/doc/html/latest/bpf/btf.html">BTF</a> capable Kernel (Linux Kernel 4.18+).</summary>
+<p>
 
-    ```console
-    $ zcat /proc/config.gz | grep CONFIG_DEBUG_INFO_BTF=
-    ```
+To check whether you have a BTF enabled kernel run:
 
-    Otherwise, you need to recompile you kernel with `CONFIG_DEBUG_INFO_BTF=y`: it's size will increase of ~1.5MB, not a big deal.
+```console
+$ zcat /proc/config.gz | grep CONFIG_DEBUG_INFO_BTF=
+```
 
-- You need to install `bpftool` and `clang`.
+Otherwise, you need to recompile you kernel with `CONFIG_DEBUG_INFO_BTF=y`: it's size will increase of ~1.5MB, not a big deal.
+</p>
+</details>
 
-    On ArchLinux this is as easy as running:
+<details>
+<summary>You need to install <code>bpftool</code> and <code>clang</code>.</summary>
+<p>
 
-    ```console
-    $ sudo pacman -S bpf clang
-    ```
-- If you also wanna try the BPF LSM programs, you need a Linux Kernel 5.7+ with such a cool feature on.
+On ArchLinux this is as easy as running:
 
-    To check whether you have it enabled or not:
+```console
+$ sudo pacman -S bpf clang
+```
+</p>
+</details>
 
-    ```console
-    $ zcat /proc/config.gz | grep CONFIG_LSM=
-    ```
+<details>
+<summary>If you also wanna try the BPF LSM programs, you need a Linux Kernel 5.7+ with BPF LSM on.</summary>
+<p>
+    
+To check whether you have it enabled or not:
 
-    Check if BPF hooks are enabled for LSM by looking at the output to contain them:
+```console
+$ zcat /proc/config.gz | grep CONFIG_LSM=
+```
 
-    ```console
-    CONFIG_LSM="...,bpf"
-    ```
+Check if BPF hooks are enabled for LSM by looking at the output to contain them:
 
-    Remember that BPF hooks for LSM can also be enabled via the `lsm` Kernel boot parameters, so take a look there too.
+```console
+CONFIG_LSM="...,bpf"
+```
 
-    Also check your Kernel supports [BPF LSM instrumentation](https://github.com/torvalds/linux/blob/5d6ab0bb408ffdaac585982faa9ec8c7d5cc349f/kernel/bpf/Kconfig#L77) with:
+Remember that BPF hooks for LSM can also be enabled via the `lsm` Kernel boot parameters, so take a look there too.
 
-    ```console
-    $ zcat /proc/config.gz | grep CONFIG_BPF_LSM=
-    ```
+Also check your Kernel supports [BPF LSM instrumentation](https://github.com/torvalds/linux/blob/5d6ab0bb408ffdaac585982faa9ec8c7d5cc349f/kernel/bpf/Kconfig#L77) with:
 
-Move to the `src` directory. Here you'll find a nice [Makefile](./src/Makefile) to build all the things at once:
+```console
+$ zcat /proc/config.gz | grep CONFIG_BPF_LSM=
+```
+</p>
+</details>
+
+### Building
+
+Ok, now you can move to the `src` directory. Here you'll find a nice [Makefile](./src/Makefile) to build all the things at once:
 
 ```console
 make
