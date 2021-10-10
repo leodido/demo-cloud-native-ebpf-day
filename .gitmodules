@@ -1,3 +1,6 @@
 [submodule "libbpf"]
 	path = libbpf
 	url = https://github.com/libbpf/libbpf.git
+[submodule "phantom-attack"]
+	path = phantom-attack
+	url = https://github.com/rexguowork/phantom-attack.git
