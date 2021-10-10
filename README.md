@@ -45,7 +45,7 @@ $ sudo pacman -S bpf clang
 <details>
 <summary>If you also wanna try the BPF LSM programs, you need a Linux Kernel 5.7+ with BPF LSM on.</summary>
 <p>
-    
+
 To check whether you have it enabled or not:
 
 ```console
@@ -83,8 +83,85 @@ make trace_net
 make V=1 restrict_connect # in case you like to be verbose
 ```
 
+### Running
 
+Now it's time to run 🏃
 
+Wanna try to restrict connections towards 1.1.1.1? Try this:
+
+```console
+$ sudo ./restrict_connect
+
+Then, in another terminal:
+
+```console
+$ curl https://1.1.1.1
+$ ping 1.1.1.1
+```
+
+And observe the output!
+
+Notice that all the other eBPF programs in this repo (so, except `restrict_connect` at the moment)
+work only against connections coming from executables which name is `attack_connect`.
+
+This means they'll ignore connections generating from `curl`, etc.
+
+## Evaluation
+
+One of the reasons because this repository (and its talk) exist was because I wanted to test an attack (CVE)
+that in some circumstances (ie., `userfaultfd` syscall enabled) is able to bypass security auditing tools
+based on tracepoints (that are not there for this goal, but still...).
+
+Wanna know more about this attack? Watch this [DEFCON talk](https://youtu.be/yaAdM8pWKG8) by my friend Xiaofei Rex Guo.
+
+Now, let's say that you wanna try the attack yourself targeting one of the eBPF programs here.
+
+First, you'll need to verify whether you have the `userfaultfd` syscall.
+
+```console
+zcat /proc/config.gz | grep CONFIG_USERFAULTFD
+```
+
+You'll also need to verify if it is enabled for unprivileged users
+(surprisingly, it is enabled for unprivileged users in many distro kernels).
+
+```console
+cat /proc/sys/vm/unprivileged_userfaultfd
+```
+
+If `/proc/sys/vm/unprivileged_userfaultfd` is set to `0`, for the sake of this experimentation set it to `1`, like so:
+
+```console
+sudo sysctl -w vm.unprivileged_userfaultfd=1
+```
+
+Now you should be able to doo you experimentations!
+
+First, start an eBPF program of your choice...
+
+Then, it's attack time:
+
+```console
+pushd phantom-attack/phantom_v1/
+make
+popd
+./phantom-attack/phantom_v1/attack_connect
+```
+
+I also wrote a bash script to make these experimentations more straightforward.
+
+Maybe, one day, I'll publish the results of such experimentations among different kernel releases, eBPF programs, etc.
+
+Anyways, you can find it at [experiment.sh](./experiment.sh) in this repo and you can execute it by providing the number of times you want the attack to run (let's say 10?) and the eBPF program to target (let's say `audit_connect`?).
+
+```console
+./experiment.sh -i 10 -p audit_connect
+```
+
+Have fun!
+
+~
+Leo
 
 ---
 
