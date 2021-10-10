@@ -2,6 +2,20 @@
 
 This repository contains the code I used for the demo during my [talk](https://sched.co/mFTQ) @ Cloud Native eBPF Day NA 2021.
 
+Here you'll find the following eBPF programs:
+
+**restrict_connect**
+: BPF LSM program (on `socket_connect` hook) that prevents any connection towards 1.1.1.1 to happen
+
+**audit_connect**
+: program that shows BPF LSM for auditing (on `socket_connect` hook)
+
+**kprobe_connect**
+: program that instruments a kprobe on the Kernel function (`security_socket_connect`) installing the `socket_connect` hook
+
+**trace_net**
+: eBPF program for the `net/net_dev_queue` tracepoint
+
 ## Usage
 
 First thing you'd need to clone this repository, isn't it?
@@ -108,9 +122,12 @@ This means they'll ignore connections generating from `curl`, etc.
 
 ## Evaluation
 
-One of the reasons because this repository (and its talk) exist was because I wanted to test an attack (CVE)
+One of the reasons because this repository (and its talk) exist was because I wanted to test an attack ([CVE-2021-33505](https://nvd.nist.gov/vuln/detail/CVE-2021-33505))
 that in some circumstances (ie., `userfaultfd` syscall enabled) is able to bypass security auditing tools
-based on tracepoints (that are not there for this goal, but still...).
+based on tracepoints (that were not exactly made to accomplish this goal, but still...).
+
+So, I wanted to verify which tracing implementations for the security context
+are vulnerable to this attack... And here we are. 🙃
 
 Wanna know more about this attack? Watch this [DEFCON talk](https://youtu.be/yaAdM8pWKG8) by my friend Xiaofei Rex Guo.
 
