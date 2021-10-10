@@ -32,3 +32,30 @@ void sig_int(int signo)
 {
     stop = signo;
 }
+
+int bpf_trace_pipe(int out)
+{
+    // todo > find mount -> use mnt/trace_pipe
+
+    int inp = STDERR_FILENO;
+    inp = open("/sys/kernel/debug/tracing/trace_pipe", O_RDONLY);
+    if (inp < 0)
+    {
+        return inp;
+    }
+
+    while (!stop)
+    {
+        static char buf[4096];
+        ssize_t ret;
+
+        ret = read(inp, buf, sizeof(buf));
+        if (ret > 0 && write(out, buf, ret) == ret)
+        {
+            continue;
+        }
+    }
+
+    close(inp);
+    return 0;
+}
