@@ -35,7 +35,7 @@ void sig_int(int signo)
 
 int bpf_trace_pipe(int out)
 {
-    // todo > find mount -> use mnt/trace_pipe
+    // todo > find mount -> use mnt/trace_pipe (making strong assumptions atm)
 
     int inp = STDERR_FILENO;
     inp = open("/sys/kernel/debug/tracing/trace_pipe", O_RDONLY);

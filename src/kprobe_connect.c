@@ -1,5 +1,4 @@
 #include "utils.c"
-#include <unistd.h>
 #include "kprobe_connect.skel.h"
 
 int main(int argc, char **argv)
@@ -36,14 +35,7 @@ int main(int argc, char **argv)
         goto cleanup;
     }
 
-    printf("Please run `sudo cat /sys/kernel/debug/tracing/trace_pipe` "
-           "to see output of the BPF programs. ✌️\n");
-
-    while (!stop)
-    {
-        fprintf(stderr, ".");
-        sleep(1);
-    }
+    err = bpf_trace_pipe(STDERR_FILENO);
 
 cleanup:
     kprobe_connect_bpf__destroy(skel);
