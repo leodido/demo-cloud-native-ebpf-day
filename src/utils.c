@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <signal.h>
 #include <errno.h>
 #include <sys/resource.h>
@@ -7,7 +9,7 @@
 
 static int libbpf_print_fn(enum libbpf_print_level level, const char *format, va_list args)
 {
-    return vfprintf(stderr, format, args);
+    return vfprintf(stdout, format, args);
 }
 
 static void bump_memlock_rlimit(void)
