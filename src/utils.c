@@ -30,5 +30,5 @@ static volatile sig_atomic_t stop;
 
 void sig_int(int signo)
 {
-    stop = 1;
+    stop = signo;
 }
