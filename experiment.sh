@@ -103,6 +103,8 @@ fi
 
 echo "$program: PID: [$pid]"
 
+sleep .5
+
 attack_log="/tmp/${program}_attack.log"
 rm -rf "$attack_log"
 # Run the attacks
