@@ -69,11 +69,11 @@ int handle_net_dev_queue(struct trace_event_raw_net_dev_template *ctx)
         {
             if (full_printk)
             {
-                bpf_printk("tp/sched/net_dev_queue: %pI4", &res);
+                bpf_printk("tp/net/net_dev_queue: %pI4", &res);
             }
             else
             {
-                bpf_printk("tp/sched/net_dev_queue: %d", res);
+                bpf_printk("tp/net/net_dev_queue: %d", res);
             }
         }
     }
