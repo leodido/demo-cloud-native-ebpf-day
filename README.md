@@ -173,10 +173,10 @@ I also wrote a bash script to make these experimentations more straightforward.
 
 Maybe, one day, I'll publish the results of such experimentations among different kernel releases, eBPF programs, etc.
 
-Anyways, you can find it at [experiment.sh](./experiment.sh) in this repo and you can execute it by providing the number of times you want the attack to run (let's say 10?) and the eBPF program to target (let's say `audit_connect`?).
+Anyways, you can find it at [experiment.sh](./experiment.sh) in this repo and you can execute it by providing the number of times you want the attack to run (let's say 10?) and the eBPF program to target (let's say `trace_connect`?).
 
 ```console
-$ ./experiment.sh -i 10 -p audit_connect
+$ ./experiment.sh -i 100 -p trace_connect
 ```
 
 Have fun!

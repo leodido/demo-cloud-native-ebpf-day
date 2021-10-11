@@ -3,3 +3,4 @@ src/restrict_connect
 src/kprobe_connect
 src/trace_net
 src/audit_connect
+src/trace_connect
