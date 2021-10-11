@@ -13,6 +13,8 @@ Here you'll find the following eBPF programs:
   <dd>program that instruments a kprobe on the Kernel function (<code>security_socket_connect</code>) installing the <code>socket_connect</code> hook</dd>
   <dt><a href="./src/trace_net.bpf.c">trace_net</a></dt>
   <dd>eBPF program for the <code>net/net_dev_queue</code> tracepoint</dd>
+  <dt><a href="./src/trace_connect.bpf.c">trace_connect</a></dt>
+  <dd>eBPF program tracing the entering of the <code>connect</code> syscall</dd>
 </dl>
 
 ## Usage
